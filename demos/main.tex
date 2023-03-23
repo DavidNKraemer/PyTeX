@@ -1,0 +1,904 @@
+\documentclass[11pt,onecolumn]{IEEEtran}  % this is a test
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[square,numbers]{natbib}
+\bibliographystyle{abbrvnat}
+\usepackage{fullpage}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{comment}
+
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+\newcommand{\david}[1]{\textcolor{blue}{\textsf{David: #1}}}  % this is a test
+\newcommand{\pavlo}[1]{\textcolor{orange}{\textsf{Pavlo: #1}}}
+\newcommand{\sayaka}[1]{\textcolor{red}{\textsf{Sayaka: #1}}}
+
+\newcommand{\email}[1]{\href{mailto:#1}{\texttt{#1}}}
+
+\newcommand{\Ab}{\mathbb{A}}
+\newcommand{\Eb}{\mathbb{E}}
+\newcommand{\Hb}{\mathbb{H}}
+\newcommand{\Kb}{\mathbb{K}}
+\newcommand{\Nb}{\mathbb{N}}
+\newcommand{\Pb}{\mathbb{P}}
+\newcommand{\Qb}{\mathbb{Q}}
+\newcommand{\Rb}{\mathbb{R}}
+\newcommand{\Sb}{\mathbb{S}}
+\newcommand{\Xb}{\mathbb{X}}
+\newcommand{\Yb}{\mathbb{Y}}
+
+\newcommand{\Bc}{\mathcal{B}}
+\newcommand{\Fc}{\mathcal{F}}
+\newcommand{\Gc}{\mathcal{G}}
+\newcommand{\Kc}{\mathcal{K}}
+\newcommand{\Xc}{\mathcal{X}}
+\newcommand{\Hc}{\mathcal{H}}
+\newcommand{\Yc}{\mathcal{Y}}
+
+\renewcommand{\bar}{\overline}
+\newcommand{\hto}{\xrightarrow{d_H}}
+\newcommand{\lto}{\xrightarrow{\lambda}}
+\newcommand{\inv}{^{-1}}
+\newcommand{\one}[1]{\mathbf{1}\set{#1}}
+\newcommand{\oneAlt}[1]{\mathbf{1}_{#1}}
+\newcommand{\iid}{\overset{\mathrm{iid}}{\sim}}
+\newcommand{\defeq}{:=}%\overset{\mathrm{def}}{=}}
+
+\newcommand{\mdp}{\textsc{mdp}}
+\newcommand{\mdpii}{\textsc{mdpii}}
+\newcommand{\pomdp}{\textsc{pomdp}}
+\newcommand{\pomdpOne}{\pomdp{}${}_{1}$}
+\newcommand{\pomdpTwo}{\pomdp{}${}_{2}$}
+\newcommand{\comdp}{\textsc{comdp}}
+
+\DeclareMathOperator{\cl}{\mathrm{cl}}
+\DeclareMathOperator{\Gr}{\mathrm{Gr}}
+\DeclareMathOperator{\Uniform}{\mathrm{Uniform}}
+\DeclareMathOperator{\Gaussian}{\mathrm{Gaussian}}
+\DeclareMathOperator{\Normal}{\mathrm{Normal}}
+\DeclareMathOperator{\diag}{\mathrm{Diag}}
+
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\abs}{|}{|}
+\DeclarePairedDelimiter{\norm}{\|}{\|}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem*{assumption*}{Assumption}
+\newtheorem{example}{Example}
+\newtheorem{condition}{Condition}
+
+\allowdisplaybreaks
+
+\title{%
+    Continuity for Discrete-Time Control System Filters Defined by Explicit Equations
+}
+
+\author{
+    Eugene A. Feinberg,
+    Sayaka Ishizawa, %
+    Pavlo O. Kasyanov,
+    and David N. Kraemer % potentially add Jacob Mazor
+    \thanks{%
+        [Financial Support Acknowledgement]
+    }
+    \thanks{%
+        E. A. Feinberg is with the Department of Applied Mathematics and Statistics, State University of New York at Stony Brook, Stony Brook, NY 11794-3600, USA, (e-mail: \email{eugene.feinberg@stonybrook.edu}).
+    }
+
+    \thanks{%
+        S. Ishizawa is with the Department of Applied Mathematics and Statistics, State University of New York at Stony Brook, Stony Brook, NY 11794-3600, USA, (e-mail: \email{sayaka.ishizawa@stonybrook.edu}).
+    }
+
+    \thanks{%
+        D. N. Kraemer is with the Department of Applied Mathematics and Statistics, State University of New York at Stony Brook, Stony Brook, NY 11794-3600, USA, (e-mail: \email{david.kraemer@stonybrook.edu}).
+    }
+    \thanks{%
+        P. O. Kasyanov is with the Institute for Applied System Analysis, National Technical University of Ukraine “Igor Sikorsky Kyiv Polytechnic Institute", Peremogy ave., 37, build, 35, 03056, Kyiv, Ukraine, (e-mail: \email{kasyanov@i.ua}).
+    }
+}
+
+\date{\today}
+
+\begin{document}
+
+% IEEE Automatic Control
+
+\doublespacing
+
+\maketitle
+
+\begin{abstract}
+    Discrete time control systems with dynamics and observations arising from stochastic equations are common in engineering, operations research, health care, and economics, and these systems are special cases of partially-observable Markov decision processes (POMDPs). Recent work by the authors have given general sufficient conditions for the existence of optimal policies and the correctness of optimality equations for a large class of POMDPs. This paper gives general sufficient conditions for a discrete time control system to generate an associated POMDP with these properties. The flexibility of the framework is shown with examples to state space models with additive noise and models of inventory control with multiple products.
+\end{abstract}
+
+\begin{IEEEkeywords}
+    adaptive control, control systems, filter, POMDPs
+% Enter key words or phrases in alphabetical  order, separated by commas. For a list of suggested keywords, send a blank  e-mail to keywords@ieee.org or visit \url{https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=494082}
+\end{IEEEkeywords}
+
+\section{Introduction} \label{sec:introduction}
+
+Many control problems in science and engineering are naturally defined by stochastic equations.  For example, nonlinear filtering problems are often defined as discrete-time control systems with dynamics and observations arising from equations of the form, for $t=0,1,2,\dots$,
+\begin{subequations}\label{eq:general_kalman_filter}
+    \begin{align}
+        x_{t+1} &= f(x_t, a_t, \xi_t) &&
+        x_t \in \Xb, \quad
+        a_t \in \Ab, \quad
+        \xi_t \in \Xc
+        \label{eq:general_kalman_filter_states} \\
+        y_{t+1} &= h(x_{t+1}, \eta_{t+1}), &&
+        y_{t+1} \in \Yb, \quad
+        \eta_{t+1} \in \Hc,
+    \label{eq:general_kalman_filter_obs}
+    \end{align}
+\end{subequations}
+where $d$, $\ell$, $p$, $r$, and $m$ are natural numbers, $x_t$ denotes the state, $a_t$ is the action, $y_t$ is the observation, and $\xi_t$ and $\eta_t$ are random disturbances. While the equation~\eqref{eq:general_kalman_filter_states} gives rise to a Markov decision process (\mdp{}), because the state $x_t$ is never directly observed, the combined state transition and observation model~\eqref{eq:general_kalman_filter_obs} can be modeled as a partially observable \mdp{} (\pomdp{}). For \pomdp{}s defined by such stochastic equations, this paper studies sufficient conditions for the existence of optimal policies, the validity of optimality equations, and convergence of value iterations to optimal values.  The answer to the question on whether these three properties hold depend on continuity properties of transition probabilities of the filtered process, whose states are posterior state distributions, which are often called beliefs. This paper describes sufficient conditions on the equations guaranteeing weak continuity of transition probabilities for belief states.
+
+There are several ways that the partial observability of the underlying controlled system has been modeled historically. The study of controlling random processes with incomplete information began with seminal works of~\citet{shiryaev_1966} and~\citet{dynkin_1965}.~\citet{aoki_1965} and~\citet{astrom_1965} formulated finite horizon \pomdp{} models for stochastic control problems.~\citet{sawaragi_1970} considered problems with uncountable action spaces, and~\citet{rhenius_1974} and~\citet{yushkevich_1976_reduction} studied general models with Borel state and action spaces.~\citet{sondik_1971,sondik_1978_optimal} and~\citet{smallwood_1973_optimal} examined the problem of determining optimal policies for \pomdp{}s in the finite and infinite horizon.
+
+In this paper, we follow the framework of~\citet{feinberg_markov_2022}, where partial observability is modeled by a stochastic kernel $P(dx_{t+1}, dy_{t+1}|x_t,a_t)$ simultaneously governing state transitions and observations. This kernel, which we refer to as Platzman's model~\cite{platzman_1980}, generalizes two common formulations of \pomdp{}s, which are called \pomdpOne{} and~\pomdpTwo{} by~\citet{feinberg_markov_2022}. A \pomdpOne{} is governed by two kernels, $T_1(dx_{t+1}|x_t,a_t)$ for state transitions and $Q_1(dy_{t+1}|x_t,a_t)$ for observations, where $P(dx_{t+1},dy_{t+1}|x_t,a_t) = T_1(dx_{t+1}|x_t,a_t)Q_1(dy_{t+1}|x_t,a_t)$. A \pomdpTwo{} is similarly determined by the formula $P(dx_{t+1}, dy_{t+1} | x_t,a_t) = T_2(dx_{t+1}|x_t,a_t)Q_2(dy_{t+1}|a_t,x_{t+1})$. We note that $T_1$ and $T_2$ agree, while for the observation kernels $Q_1$ and $Q_2$, the former relies on the current state and the latter the next state. Platzman's model is still yet a special case of an \mdp{} with incomplete information (\mdpii{}), introduced in~\citet{feinberg_markov_2022}; see the introduction therein for examples of models of each kind in the literature. In this paper, our primary interest concerns \pomdpTwo{}, and we will colloquially call these \pomdp{}s.
+
+This paper is organized as follows. Section~\ref{sec:continuity_of_stochastic_kernels} considers the transition kernel of the filtered process from a \pomdp{}. Section~\ref{sec:semi-uniform_Feller} provides sufficient conditions for semi-uniform Feller continuity of the joint stochastic kernel $P$. Section~\ref{sec:conditions} gives general sufficient conditions that imply continuity for stochastic kernels arising from equations. Section~\ref{sec:pomdp_kernels} provides an overview of \pomdp{}s and their reduction to \comdp{}s.  Section~\ref{sec:applications} considers applications to state space models with additive noise, such as the Kalman filter, models with multiplicative ``speckled'' noise, and models of inventory control. Section~\ref{sec:pomdp1} provides an analogous theory to Section~\ref{sec:semi-uniform_Feller} for \pomdpOne{} problems. Finally, Section~\ref{sec:proofs} supplies the proofs for the main results of the paper. 
+
+
+\section{Continuity of Stochastic Kernels Arising from Stochastic Equations} \label{sec:continuity_of_stochastic_kernels}
+
+Consider a discrete-time control system with dynamics and observations defined by the following stochastic equations:
+\begin{subequations}\label{eq:model}
+    \begin{align}
+        x_{t+1} &= F(x_t, a_t, \xi_t), && x_t \in \Xb, \quad a_t \in \Ab, \quad \xi_t \in \Xc, \label{eq:transition_model} \\
+        y_{t+1} &= G(a_t, x_{t+1}, \eta_{t+1}), && y_t \in \Yb, \quad \eta_t \in \Hc \label{eq:observation_model}
+    \end{align}
+\end{subequations}
+for each $t = 0, 1, \dots$, where $\Xb$, $\Yb$, $\Ab$ are spaces of states, observations, and actions, respectively, $\Xc$ is the space of state noises, and $\Hc$ is the space of observation noises. These spaces are assumed to be Borel subsets of Polish (i.e., separable, complete metric) spaces, and when necessary, we will explicitly require that a given space is Euclidean. We assume that $F : \Xb \times \Ab \times \Xc \to \Xb$ and $G : \Ab \times \Xb \times \Hc \to \Yb$ are Borel measurable functions and that $y_0 = G_0(x_0, \eta_0)$ for a measurable function $G_0 : \Xb \times \Hc \to \Yb$. The sequences $\set{\xi_t}_{t=1}^{\infty}$ and $\set{\eta_t}_{t=1}^{\infty}$ are each iid with distributions $\mu$ on $\Xc$ and $\nu$ on $\Hc$, respectively.
+
+The evolution of a system defined by stochastic equations such as~\eqref{eq:model} can equivalently be viewed in terms of stochastic kernels. Let $\Sb_1$, $\Sb_2$, and $\Sb_3$ be Borel subsets of Polish spaces. The collection of Borel sets of $\Sb$ is denoted by $\Bc(\Sb)$, and the space of probability measures on $\Sb$ is denoted by $\Pb(\Sb)$. We recall that a stochastic kernel is a function $\kappa : \Bc(\Sb_2) \times \Sb_1 \to [0,1]$, written $\kappa(B|x)$, such that
+\begin{itemize}
+    \item for each $B \in \Bc(\Sb_2)$, the map $x \mapsto \kappa(B|x)$ is a measurable function,
+    \item for each $x \in \Sb_1$, the map $B \mapsto \kappa(B|x)$ is a Borel probability measure on $\Sb_2$.
+\end{itemize}
+If $\kappa(\Sb_2|x) < 1$ for each $x \in \Sb_1$, then $\kappa$ is a substochastic kernel.
+The set of all such stochastic kernels is denoted $\Kc(\Sb_2| \Sb_1)$. Let $x_k \to x$ be an arbitrary convergent sequence in $\Sb_1$. The stochastic kernel $\kappa$ is weakly continuous if $\int f(y) \ \kappa(dy|x_k) \to \int f(y) \ \kappa(dy|x)$ for every continuous bounded function $f : \Sb_2 \to \Rb$, and continuous in total variation if
+\begin{equation*}
+    \lim_{k \to \infty} \sup_{B \in \Bc(\Xb)} \abs{\kappa(B|x_k) - \kappa(B|x)} = 0.
+\end{equation*}
+Continuity in total variation implies weak continuity.
+The functions $F$ and $G$ in~\eqref{eq:model} induce the transition and observation kernels
+\begin{subequations} \label{eq:model_kernels}
+\begin{align}
+    T(B|x, a) &= \int\limits_{\Xc} \one{F(x, a, \xi) \in B} \ \mu(d\xi), && B \in \Bc (\Xb), \quad x \in \Xb, \quad a \in \Ab, \label{eq:transition_kernel} \\
+    Q(C|a, x) & =\int\limits_{\Hc}\one{G(a, x, \eta) \in C} \ \nu(d\eta), && C \in \Bc (\Yb), \quad a \in \Ab, \quad x \in \Xb, \label{eq:observation_kernel}
+\end{align}
+\end{subequations}
+A natural and important problem in the study of control models such as~\eqref{eq:model} is to formulate conditions for which the associated stochastic kernels~\eqref{eq:model_kernels} exhibit continuity properties.
+%For example, \citet[Section 8.1]{feinberg_partially_2016} studied a model similar to~\eqref{eq:model} when the states, actions, observations, and disturbances are all elements of $\Rb$. They provided general sufficient conditions for control systems with dynamics and observations~\eqref{eq:model} to admit stochastic kernels that are weakly continuous and continuous in total variation. The appropriate generalization of those results to the multidimensional setting is the main result of this paper.
+
+For a continuously differentiable function $\phi : \Rb^n \to \Rb^n$ denote $D_x \phi = \frac{\partial \phi}{\partial x}$ its Jacobian. Lebesgue measure on $\Rb^n$ is denoted $\lambda^{[n]}$, or $\lambda$ when there is no ambiguity.  Given two measures $\mu, \nu \in \Pb(\Sb)$, we write $\nu \ll \mu$ if $\nu$ is absolutely continuous with respect to $\mu$ and $d\nu = f \ d\mu$ to indicate that $f$ is an associated Radon-Nikodym derivative. Throughout the paper we will consider functions $\phi : \Sb \times \Rb^n \to \Rb^n$, where $\Sb$ is a metric space. We will frequently suppose $\phi$ satisfies the following condition:
+\begin{condition} \label{cond:standard_assumption}
+    For a metric space $\Sb$ and a function $\phi : \Sb \times \Rb^n \to \Rb^n$ carrying $(x,y)$ to $\phi(x,y)$, the following statements hold:
+    \begin{enumerate}
+        \item $\phi$ is continuous;
+        \item $\phi$  differentiable in $y$;
+        \item the matrix $D_y \phi(x,y)$ is nonsingular for all $x$ and $y$;
+        \item the function $(x, y) \mapsto D_y \phi(x,y)$ is continuous.
+    \end{enumerate}
+\end{condition}
+
+Theorem~\ref{thm:main_result} gives conditions for continuity of the kernels $T$,
+$Q$, and $P$ in models arising from the stochastic equations~\eqref{eq:model}. These conditions are formulated in the following three assumptions.
+\begin{assumption} \label{ass:transition_observation_1}
+    The following statements hold:
+    \begin{enumerate}[label=\alph*)]
+        \item \label{item:F1} for $\mu$-a.s. $\xi \in \Xc$ the map $(x,a) \mapsto F(x,a,\xi)$ is continuous;
+        \item \label{item:G1} $\Yb=\Hc=\Rb^m$, $\nu \ll \lambda^{[m]}$, and the function $((a,x),\eta) \mapsto G(a,x,\eta)$ satisfies Condition~\ref{cond:standard_assumption}.
+    \end{enumerate}
+\end{assumption}
+
+If $\Xb = \Yb = \Ab = \Xc = \Hc = \Rb$ and $\nu = \Uniform(0,1)$, then  Assumption~\ref{ass:transition_observation_1} corresponds to the stated assumptions in~\citet[Section 8.1]{feinberg_partially_2016}. In fact, the assumptions there state the additional property that the derivative $D_\eta G(a,x,\eta)$ is uniformly bounded away from the origin. However, for the purposes of the proof, this property is assured by Assumption~\ref{ass:transition_observation_1}(\ref{item:G1}. Therefore, Assumption~\ref{ass:transition_observation_1} is the appropriate generalization. We also consider the following new assumption, which strengthens the requirements on the transition dynamics~\eqref{eq:transition_model} and weakens the requirements on the observation model~\eqref{eq:observation_model}.
+
+\begin{assumption} \label{ass:transition_observation_2}
+    The following statements hold:
+    \begin{enumerate}[label=\alph*)]
+        \item \label{item:F2} $\Xb=\Xc=\Rb^d$, $\mu \ll \lambda^{[d]}$, and the function $((x,a),\xi) \mapsto F(x,a,\xi)$ satisfies Condition~\ref{cond:standard_assumption};
+        \item \label{item:G2} either $G$ does not depend on $a$, or the following two conditions hold: (i) $\Yb=\Hc=\Rb^m$ and $\nu \ll \lambda^{[m]}$, and (ii) for each $x \in \Xb$ the function $(a,\eta) \mapsto G(a,x,\eta)$ satisfies Condition~\ref{cond:standard_assumption}.
+    \end{enumerate}
+\end{assumption}
+
+
+We observe that Assumption~\ref{ass:transition_observation_1}(\ref{item:G2} requires that the observation disturbance distribution $\nu$ be absolutely continuous with respect to Lebesgue measure. This is essential for the stochastic kernel $Q$ to be continuous in total variation; see the Appendix for details. Finally, we consider an additional assumption on the model~\eqref{eq:model}.
+
+\begin{assumption} \label{ass:SUF}
+    The following statements hold:
+    \begin{enumerate}[label=\alph*)]
+        \item \label{item:F3} $\Xb=\Xc=\Rb^d$, $\mu \ll \lambda^{[d]}$, and the function $((x,a),\xi) \mapsto F(x,a,\xi)$ satisfies Condition~\ref{cond:standard_assumption};
+        \item \label{item:G3} $\Yb=\Hc=\Rb^m$, $\nu \ll \lambda^{[m]}$, and for $\nu$-a.s. $\eta \in \Yb$ the function $(a,x) \mapsto G(a,x,\eta)$ satisfies Condition~\ref{cond:standard_assumption}.
+    \end{enumerate}
+\end{assumption}
+
+We consider the additional stochastic kernel
+\begin{align}\label{eq:joint_kernel}
+    P(B \times C | x,a) &\defeq
+    \int\limits_{B} Q(C|a,x') \ T(dx'|x,a), \quad
+    B \in \Bc(\Xb), \quad
+    C \in \Bc(\Yb), \quad
+    x \in \Xb, \quad
+    a \in \Ab, \\
+    &=\int\limits_{\Xb}\int\limits_{\Yb} \one{G(a,F(x,a,\xi),\eta) \in C} \one{F(x,a,\xi)\in B} \ \nu(d\eta) \ \mu(d\xi) \label{eq:new}
+\end{align}
+which represents the joint probability of the state-observation pair $(x', y')$ given the state-action pair $(x, a)$. The kernel $P$ is instrumental in the analysis of control systems with incomplete information. Consider a measure $z \in \Pb(\Xb)$ representing a prior belief distribution for the current state $x$. We topologize $\Pb(\Xb)$ with weak convergence of probability measures. The joint distribution of the next state-observation pair $(x', y')$ conditioned by the measure $z$ and action $a \in \Ab$ is given as the stochastic kernel
+\begin{align*}
+    R(B \times C | z,a) &\defeq
+    %\int\limits_{\Xb}\int\limits_{B} Q(C|a,x') \ T(dx'|x,a) \ z(dx), &&
+    %B \in \Bc(\Xb), \quad
+    %C \in \Bc(\Yb), \quad
+    %z \in \Pb(\Xb), \quad
+    %a \in \Ab, \\
+    \int\limits_{\Xb} P(B \times C | x,a) \ z(dx), &&
+    B \in \Bc(\Xb), \quad
+    C \in \Bc(\Yb), \quad
+    z \in \Pb(\Xb), \quad
+    a \in \Ab,
+\end{align*}
+with marginal distribution for $y'$ given by $R'(C |z,a) \defeq R(\Xb \times C | z,a)$. According to~\citet[Proposition 7.27]{bertsekas_stochastic_1996} there exists a stochastic kernel $H \in \Kc(\Pb(\Xb) | \Pb(\Xb) \times \Ab \times \Yb)$ such that
+\begin{align*}
+    R(B \times C | z, a) &=
+    \int\limits_C H(B|z,a,y) \ R'(dy|z,a), &&
+    B \in \Bc(\Xb), \quad
+    C \in \Bc(\Yb), \quad
+    z \in \Pb(\Xb), \quad
+    a \in \Ab.
+\end{align*}
+Alternatively, the stochastic kernel $H$ defines a measurable mapping $(z,a,y') \mapsto H(z,a,y') \in \Pb(\Xb)$ that describes the evolution of the distributions $z$ by $z'= H(z, a, y')$. The stochastic kernel $q$ is then defined as
+\begin{align} \label{eq:comdp_kernel_Rn}
+    q(D |z, a) &\defeq
+    \int\limits_{\Yb} \one{H(z, a, y) \in D} \ R^{\prime}(dy |z, a), &&
+    D \in \Bc(\Pb(\Xb)), \quad
+    z \in \Pb(\Xb), \quad
+    a \in \Ab;
+\end{align}
+The stochastic kernel $q$ is a filter representing the transition dynamics from the prior distribution $z$ to the posterior distribution $z'$, which reduces a control system with incomplete information in states to a completely observable system over probabilities on states. As such, the weak continuity of the kernel $q$ is an important property for structural results of \pomdp{}s. The next theorem is one of the main results of this paper. It provides sufficient conditions for the stochastic kernel $q$ to be weakly continuous.
+\begin{theorem} \label{thm:main_result}
+    Under each of Assumptions~\ref{ass:transition_observation_1},~\ref{ass:transition_observation_2}, or~\ref{ass:SUF}, the stochastic kernel $q$ defined in~\eqref{eq:comdp_kernel_Rn} is weakly continuous.
+\end{theorem}
+
+The proof of Theorem~\ref{thm:main_result} is found in Section~\ref{sec:proofs}.
+
+\section{Semi-uniform Feller kernels and their properties} \label{sec:semi-uniform_Feller}
+
+In this section we consider continuity properties of the stochastic kernel $P$ defined in~\eqref{eq:joint_kernel}. The form of continuity of interest to us is semi-uniform Feller continuity, introduced by~\citet{feinberg_markov_2022,JThProb}. Suppose $\Psi \in \Kc(\Sb_1 \times \Sb_2 | \Sb_3)$ is a stochastic kernel on $\Sb_1 \times \Sb_2$ given $\Sb_3$. For $A \in \Bc(\Sb_1)$, $B \in \Bc(\Sb_2)$, and $s \in \Sb_3$, let
+\begin{equation}\label{eq:marg_new}
+    \Psi(A,B|s) \defeq \Psi(A\times B|s).
+\end{equation}
+In particular, we consider marginal stochastic kernels
+$\Psi(\Sb_1,\:\cdot\:|\:\cdot\:) \in \Kc(\Sb_2|\Sb_1)$ and $\Psi(\:\cdot\:,\Sb_2|\:\cdot\:) \in \Kc(\Sb_1|\Sb_2)$.
+
+\begin{definition}\label{defi:unifFP} [{\citet{feinberg_markov_2022,JThProb}}]
+    A stochastic kernel $\Psi$ on $\Sb_1\times\Sb_2$ given $\Sb_3$ is \emph{semi-uniform Feller} if, for each convergent sequence $s_k \to s$ in $\Sb_3$ and for each bounded continuous function $f$ on $\Sb_1$,
+    \begin{equation}\label{eq:equivWTV3}
+        \lim_{k\to\infty}
+        \sup_{B\in \Bc(\Sb_2)} \abs*{
+            \int\limits_{\Sb_1} f(x) \ \Psi(dx,B|s_{k})-\int\limits_{\Sb_1} f(x) \ \Psi(dx,B|s)
+        } = 0.
+    \end{equation}
+\end{definition}
+A semi-uniform Feller stochastic kernel $\Psi$ on $\Sb_1\times \Sb_2$ given $\Sb_3$ is weakly continuous \cite{feinberg_markov_2022,JThProb}. We recall that the marginal measure $\Psi(dx,B|s)$, $s\in\Sb_3$, is defined in \eqref{eq:marg_new}. As follows from \eqref{eq:equivWTV3},  if $\Psi$ is a semi-uniform Feller stochastic kernel on $\Sb_1\times\Sb_2$ given $\Sb_3,$ then for each $B\in\Bc(\Sb_2)$ the kernel $\Psi(dx,B|s)$ on $\Sb_1$ given $\Sb_3$ is weakly continuous, that is, if the sequence $s_k\to s$ in $\Sb_3$ as $k\to\infty$, then sequence of substochastic measures $\{\Psi(dx,B|s_k)\}_{k=1}^\infty$ converges weakly to $\Psi(dx,B|s)$.
+
+The remainder of this section deals with establishing semi-uniform Feller continuity of $P$. We recall the stochastic kernels $T$ and $Q$ defined in~\eqref{eq:model_kernels}. The next theorem states that semi-uniform Feller continuity of $P$ implies weak continuity of the stochastic kernel $q$.
+
+% TODO: Include Corollary 6.7
+\begin{theorem}[{\citet[Corollary 6.7]{feinberg_markov_2022}}] \label{thm:P_implies_q}
+    If the stochastic kernel $P$ defined in~\eqref{eq:joint_kernel} is semi-uniform Feller, then the stochastic kernel $q$ defined in~\eqref{eq:comdp_kernel_Rn} is weakly continuous.
+\end{theorem}
+
+The following theorem, Corollary 6.11 in~\citet{ feinberg_markov_2022}, gives general sufficient conditions for the semi-uniform Feller continuity of $P$.
+
+\begin{theorem}[{\citet[Corollary 6.11]{feinberg_markov_2022}}] \label{thm:pomdp_to_comdp_kernel}
+    Consider the transition and observation stochastic kernels $T$ and $Q$ and the stochastic kernel $P$ defined in~\eqref{eq:joint_kernel}.
+    If either of the following statements hold:
+    \begin{enumerate}
+        \item $T$ is weakly continuous, and $Q$ is continuous in total variation;
+        \item $T$ is continuous in total variation, and $Q$ is continuous in $a$ in total variation.
+    \end{enumerate}
+    Then $P$ is semi-uniform Feller, and in view of Theorem~\ref{thm:P_implies_q}, the stochastic kernel $q$ defined in~\eqref{eq:comdp_kernel_Rn} weakly continuous.
+\end{theorem}
+
+
+Let us establish necessary and sufficient conditions for the kernel $P$ defined in~\eqref{eq:joint_kernel} to be semi-uniform Feller.
+\textcolor{blue}{
+\begin{theorem}\label{thm:new}
+    Suppose that for $\mu$-a.s. $\xi$ the map $(x,a) \mapsto F(x,a,\xi)$ is continuous. Then the stochastic kernel $P$ defined in~\eqref{eq:joint_kernel} with representation~\eqref{eq:new} is semi-uniform Feller if and only if  its marginal kernel $P(\Xb , C|x,a)$
+    is continuous in total variation.
+\end{theorem}}
+
+
+In view of Theorems~\ref{thm:pomdp_to_comdp_kernel} and~\ref{thm:new}, Assumptions~\ref{ass:transition_observation_1}--\ref{ass:SUF} each imply that the stochastic kernel $P$ is semi-uniform Feller. This is formulated in the next theorem, which is the main reesult of this section.
+
+
+\begin{theorem} \label{thm:main_result_P}
+    Under Assumptions~\ref{ass:transition_observation_1},~\ref{ass:transition_observation_2}, or~\ref{ass:SUF}, the stochastic kernel $P$ defined in~\eqref{eq:joint_kernel} is semi-uniform Feller.
+\end{theorem}
+
+The proof of Theorem~\ref{thm:main_result_P} is found in Section~\ref{sec:proofs}.
+
+\section{Continuity of Stochastic Kernels Defined by Equations} \label{sec:conditions}
+
+In this section we provide two theorems regarding the continuity of stochastic kernels arising from equations.  Let $\Sb_1$, $\Sb_2$, and $\Yc$ be Borel subsets of Polish spaces. We consider the function $\phi : \Sb_1 \times \Yc \to \Sb_2$ and probability measure $\mu \in \Pb(\Yc)$, we consider the stochastic kernel
+\begin{equation} \label{eq:stochastic_kernel}
+    \kappa(B|x) \defeq \int\limits_{\Yc} \one{\phi(x,y) \in B} \ \mu(dy)
+\end{equation}
+in $\Kc(\Sb_2|\Sb_1)$. The function $\phi$ is said to satisfy Caratheodory's assumptions if $y \mapsto \phi(x,y)$ is measurable and $x \mapsto \phi(x,y)$ is  continuous for $\mu$-a.s. $y$. The next lemma provides sufficient conditions for $\kappa$ to be weakly continuous.
+
+\textcolor{blue}{
+\begin{theorem} \label{lem:weak_continuous}
+    Suppose $\mu \in \Pb(\Yc)$, and suppose the function $x \mapsto \phi(x,y)$ is continuous for $\mu$-a.s. $y \in \Yc$. Then the stochastic kernel $\kappa \in \Kc(\Sb_2|\Sb_1)$ defined by~\eqref{eq:stochastic_kernel} is weakly continuous.
+\end{theorem}}
+
+\begin{proof}
+    Let $x_k \to x$, and let $h : \Sb_2 \to \Rb$ be a continuous bounded function. Letting $f_k(y) \defeq h(\phi(x_k,y))$ and $f(y) \defeq h  (\phi(x,y))$, it follows from continuity of $h$ and of $x \mapsto \phi(x,y)$ for $\mu$-a.s. $y$ that $f_k \to f$ $\mu$-a.s. Since $\abs{h} \leq M < +\infty$, it follows that $\abs{f}, \abs{f_k} \leq M$, and the dominated convergence theorem implies
+    \begin{equation*}
+        \lim_{k \to \infty} \int\limits_{\Yc} h(y) \ \kappa(dy|x_k)
+        =
+        \lim_{k \to \infty} \int\limits_{\Yc} h(F(x_k,y)) \ \mu(dy)
+        =
+        \int\limits_{\Yc} h(F(x,y)) \ \mu(dy)
+        =
+        \int\limits_{\Yc} h(y) \ \kappa(dy|x),
+    \end{equation*}
+    so $\kappa$ is weakly continuous.
+\end{proof}
+
+Theorem~\ref{lem:weak_continuous} generalizes the argument in~\citet[p. 92]{hernandez-lerma_adaptive_1989}, which assumes that the function $\phi$ is continuous in both variables. The next theorem shows that for the spaces $\Sb_2 = \Yc = \Rb^n$, if $\mu$ is a continuous distribution and $\phi$ satisfies Condition~\ref{cond:standard_assumption}, the stochastic kernel $\kappa$ is continuous in total variation.
+
+\begin{theorem} \label{thm:continuous_total_variation}
+    Suppose $\Sb_2 = \Yc = \Rb^m$, $\mu \ll \lambda^{[m]}$ and suppose the function $\phi(x,y)$ satisfies Condition~\ref{cond:standard_assumption}. Then the stochastic kernel $\kappa \in \Kc(\Sb_2|\Sb_1)$ defined in~\eqref{eq:stochastic_kernel} is continuous in total variation.
+\end{theorem}
+The proof of Theorem~\ref{thm:continuous_total_variation} can be found in Section~\ref{sec:proofs}. The following two examples show that the assumption $\mu \ll \lambda^{[m]}$ cannot be relaxed in Theorem~\ref{thm:continuous_total_variation}.
+
+\begin{example}[Discrete] \label{ex:delta_measure}
+    Suppose $\Sb_1=\Sb_2=\Yc=\Rb$, and let $\kappa(B|x) = \one{x \in B}$. Consider the sequence $x_k = k^{-1}$ for $k=1,2,\dots$, and let $B = \set{0}$. Then $x_k \to 0$, $\kappa(B|0) = 1$, and $\kappa(B|x_k) = 0$ for all $k=1,2,\dots$; hence, $\kappa$ is not continuous in total variation.
+\end{example}
+
+Example~\ref{ex:delta_measure} shows that continuity in total variation may fail when $\mu$ is a discrete probability distribution. The next example shows that continuity in total variation can also fail when the observation disturbance has a more general singular component with respect to Lebesgue measure.
+
+
+\begin{example}[Degenerate Gaussian] \label{ex:degenerate_gaussian}
+    Consider a white noise process $\mu = \Gaussian(0, \Sigma)$, where the covariance matrix $\Sigma \in \Rb^{m \times m}$ is assumed to be singular. Then $\mu$ is supported on a proper subspace $V$ of $\Yc$. Let $z \in V^\perp$ be any nonzero vector, and let us consider the kernel 
+    \begin{equation*}
+        \kappa(B|x) = 
+        \int_{\Yc} \one{xz + y \in B} \ \mu(dy), \qquad B \in \Bc(\Rb^m), \qquad x \in \Rb
+    \end{equation*}
+    We observe that $\kappa(V|x) = 0$ if $x \ne 0$, but $\kappa(V|x) = 1$ if $x = 0$. Thus, $\kappa$ is not continuous in total variation.
+\end{example}
+
+The implication of Example~\ref{ex:degenerate_gaussian} is that for additive Gaussian noise models (see Section~\ref{subsec:additive_noise}), continuity in total variation of the observation kernel $Q$ fails when the observation noise distribution is degenerate. This means, in particular, that noise cannot be shared across vector components.
+
+
+\section{Existence of Optimal Policies, Validity of Optimality Equations, and Convergence of Value Iterations for \pomdp{}s} \label{sec:pomdp_kernels}
+
+In this section we consider an application of the results of Sections~\ref{sec:continuity_of_stochastic_kernels} and~\ref{sec:semi-uniform_Feller} to partially-observable Markov decision processes (\pomdp{}s). A \pomdp{} is a tuple $(\Xb, \Yb, \Ab, T, Q, c)$, where $\Xb$, $\Yb$, and $\Ab$ are the Borel subsets of Polish spaces consisting of states, observations, and actions, $T \in \Kc(\Xb| \Xb \times \Ab)$ is the state transition kernel, $Q \in \Kc(\Yb| \Ab \times \Xb)$ is the observation kernel, and $c : \Xb \times \Ab \to (-\infty, +\infty]$ is a bounded-below Borel measurable one-step cost function. The \pomdp{} evolves as follows. The initial unobservable state $x_0$ is assumed to have the distribution $p \in \Pb(\Xb)$. The initial observation $y_0$ is distributed according to the initial observation kernel $Q_{0}\left(\:\cdot\:| x_{0}\right)$. At each time epoch $t=0,1, \ldots$, if the state of the system is $x_{t} \in \Xb$ and the decision maker chooses an action $a_{t} \in \Ab$, then the cost $c(x_{t}, a_{t})$ is incurred,  the system moves to the state $x_{t+1} \sim P(\:\cdot\: | x_{t}, a_{t})$, and the new observation $y_{t+1} \sim Q(\:\cdot\: | a_{t}, x_{t+1})$ is recorded.
+
+Let $\Hb_0 \defeq \Pb(\Xb) \times \Yb$ and $\Hb_{t+1} \defeq \Hb_t \times (\Ab \times \Yb)$ denote the set of observable histories at times $t=0,1,2,\dots$. A policy $\pi$ for the \pomdp{} is a sequence $\set{\pi_t}_{t=0}^{\infty}$ of stochastic kernels $\pi_t \in \Kc(\Ab| \Hb_t)$. Let $\Pi$ denote the set of policies. A policy $\pi$ is nonrandomized if each measure $\pi_t(\:\cdot\:|h_t)$ is concentrated on a single point. The Ionescu-Tulcea theorem (see, e.g.,~\citet[Proposition 7.28]{bertsekas_stochastic_1996}) implies that for every policy $\pi$, initial distribution $p$, and stochastic kernels $T$, $Q$, and $Q_0$, there exists a unique probability measure $P_{p}^\pi$ on the set of trajectories $(\Xb \times \Yb \times \Ab)^{\infty}$ with the associated product $\sigma$-algebra of $\Bc(\Xb)$, $\Bc(\Yb)$, and $\Bc(\Ab)$. Expectation against this measure is denoted by $E_{p}^{\pi}$. For a horizon $T=1,2,\dots, \infty$ and discount rate $\alpha \geq 0$, the expected total discounted costs are
+\begin{align} \label{eq:value_fn}
+    V_{T,\alpha}^{\pi}(p) &\defeq E_p^\pi \sum_{t=0}^{T-1} \alpha^t c(x_t, a_t) &&
+    p \in \Pb(\Xb), \quad \pi \in \Pi,
+\end{align}
+where $V_{0,\alpha}^{\pi}(p) \defeq 0$, and $V_{\alpha}^{\pi}(p) \defeq V_{\infty,\alpha}^{\pi}(p)$. We consider two assumptions on the discount $\alpha$ and the cost function $c$ that each imply that~\eqref{eq:value_fn} is well-defined.
+\begin{assumption*}[\textbf{D}]
+    $c$ is bounded below on $\Xb \times \Ab$ and $\alpha \in [0,1)$.
+\end{assumption*}
+\begin{assumption*}[\textbf{P}]
+    $c$ is nonnegative on $\Xb \times \Ab$ and $\alpha \in [0,1]$.
+\end{assumption*}
+For Assumption (\textbf{P}) there is no loss in generality to assuming that $c$ is nonnegative. Although Assumption (\textbf{P}) is more general than Assumption (\textbf{D}), the latter is common in applications. When a \pomdp{} is degenerate, i.e., $\Yb = \Xb$ and $Q(x_{t+1}|a_t, x_{t+1}) = 1$,~\eqref{eq:value_fn} is still well-defined, but we shall denote these value functions by $v_{T,\alpha}^{\pi}$ and $v_{\alpha}^{\pi}$ in lowercase.
+
+A \pomdp{} can be viewed as a \emph{completely-observable Markov decision process} (\comdp{}) by letting the state space in the \comdp{} be probability measures on the state space of the \pomdp{}. In particular, \citet{feinberg_partially_2016} considers the reduction of the \pomdp{} $(\Xb, \Yb, \Ab, T, Q, c)$ to the \comdp{} $(\Pb(\Xb), \Ab, q, \bar c)$, where the transition kernel $q \in \Kc(\Pb(\Xb)|\Pb(\Xb) \times\Ab)$ is defined in~\eqref{eq:comdp_kernel_Rn}, and the one-step cost function $\bar{c}: \Pb(\Xb) \times \Ab \to (-\infty, +\infty]$ given by the equation
+\begin{align}
+    \overline{c}(z,a) &\defeq
+    \int\limits_{\Xb}c(x,a) \ z(dx), &&
+    z \in \Pb(\Xb), \quad
+    a \in \Ab,
+\end{align}
+and $\bar c$ is well-defined since $c$ is bounded below and measurable. Through a similar construction one arrives at objective criteria of the form~\eqref{eq:value_fn} for the \comdp{} $(\Pb(\Xb), \Ab, q, \bar c)$. For the \comdp{}, histories resemble $(z_0, a_0, \dots, z_{t-1}, a_{t-1}, z_t)$ for measures $z_j \in \Pb(\Xb)$ ($j=0,\dots, t)$. To distinguish from the observable histories of a \pomdp{}, we refer to these histories as \emph{information history} and policies defined on information histories as \emph{information policies} ($I$-policies). Denote $\bar{v}_{T,\alpha}^\pi$ and $\bar{v}_{\alpha}^\pi$ the associated value functions for the \comdp{}.
+
+
+A function $f : \Sb_1 \to [-\infty, +\infty]$ is inf-compact if the sublevel set $\set{x \in \Sb_1: f(x) \leq \gamma}$ is compact for all $\gamma \in \Rb$. A function $f : \Sb_1 \times \Sb_2 \to [-\infty,+\infty]$ is $\Kb$-inf-compact on $\Sb_1 \times \Sb_2$ if for all nonempty compact sets $K \subset \Sb_1$ and $\gamma \in \Rb$, the sublevel set $\set{(x,y) \in \Sb_1 \times \Sb_2 : x \in K, f(x,y) \leq \gamma}$ is compact.  The following assumption, combined with either Assumption (\textbf{P}) or (\textbf{D}), guarantees the correctness of the finite- and discounted infinite-horizon optimality equations for the \comdp{}, existence of optimal policies, and lower semicontinuity of the value functions.
+\begin{assumption*}[\textbf{W*}]
+    The following statements hold:
+    \begin{enumerate}
+        \item The function $\bar c$ is $\Kb$-inf-compact and bounded below on $\Pb(\Xb) \times \Ab$.
+        \item The stochastic kernel $q$ is weakly continuous.
+    \end{enumerate}
+\end{assumption*}
+
+If $c$ is $\Kb$-inf-compact on $\Xb \times \Ab$ and bounded below, then $\bar c$ is $\Kb$-inf-compact on $\Pb(\Xb)$; see~\citet[Theorem 3.4]{feinberg_partially_2016}. The following theorem states conditions for the correctness of optimality equations, existence of optimal policies, and lower semicontinuity of values for the \comdp{} $(\Pb(\Xb), \Ab, q, \bar c)$.
+
+\begin{theorem}[{\citet[Theorem 2]{feinberg_average_cost_2012}, \cite[Theorem 3.1]{feinberg_partially_2016}}] \label{thm:comdp_results}
+    Let either Assumption (\textbf{D}) or Assumption (\textbf{P}) hold. If the one-step cost function $c : \Xb \times \Ab \to (-\infty, +\infty]$ is $\Kb$-inf-compact, and the stochastic kernel $P$ defined in~\eqref{eq:joint_kernel} is semi-uniform Feller, then the \comdp{} $(\Pb(\Xb), \Ab, q, \bar c)$ satisfies Assumption (\textbf{W}*), and:
+    \begin{enumerate}
+        \item the functions $\bar v_{t,\alpha}$, $t=0,1,\dots$, and $\bar v_{\alpha}$ are lower semicontinuous on $\Pb(\Xb)$, and $\bar v_{t,\alpha}(z) \to \bar v_{\alpha}(z)$ as $t \to \infty$ for all $z \in \Pb(\Xb)$;
+        \item for each $z \in \Pb(\Xb)$ and $t=0,1,\dots$,
+        \begin{align*}
+            \bar v_{t+1,\alpha}(z) &=
+            \min_{a \in \Ab} \set*{
+                \bar c (z,a) + \alpha \int\limits_{\Pb(\Xb)} \bar v_{t,\alpha}(w) \ q(dw|z,a)
+            } \\ &=
+            \min_{a \in \Ab} \set*{
+                \int\limits_{\Xb} c(x,a) \ z(dx) + \alpha
+                \int\limits_{\Xb}\int\limits_{\Xb} \int\limits_{\Yb} \bar v_{t,\alpha}( H(z,a,y)) \, Q(dy|a,x') \, P(dx'|x,a) \, z(dx)
+            },
+        \end{align*}
+        where $\bar v_{0,\alpha}(z) = 0$ for all $z \in \Pb(\Xb)$, and the nonempty sets
+        \begin{align*}
+            A_{t,\alpha}(z) &\defeq \set*{
+                a \in \Ab : \bar v_{t+1,\alpha}(z) = \bar c(z,a) + \alpha \int\limits_{\Pb(\Xb)} \bar v_{t,\alpha}(w) \ q(dw|z,a)
+            },  &&
+            z \in \Pb(\Xb), \quad
+            t=0,1,\dots,
+        \end{align*}
+        satisfy the following properties: (a) the graph $\Gr(A_{t,\alpha}) = \set{(z,a) : z \in \Pb(\Xb), a \in A_{t,\alpha}(z)}$, $t=0,1,\dots$ is a Borel subset of $\Pb(\Xb) \times \Ab$, and (b) if $\bar v_{t+1,\alpha}(z) = +\infty$, then $A_{t,\alpha}(z) = \Ab$ and, if $\bar v_{t+1,\alpha}(z) < +\infty$, then $A_{t,\alpha}(z)$ is compact;
+        \item for each $T = 1, 2, \dots$, there exists an optimal Markov $T$-horizon $I$-policy $(\phi_0, \dots, \phi_{T-1})$, and if for a $T$-horizon Markov $I$-policy $(\phi_0, \dots, \phi_{T-1})$ the inclusions $\phi_{T-1-t}(z) \in A_{t,\alpha}(z)$, $z \in \Pb(\Xb)$, $t=0,\dots, T-1$, hold, then this $I$-policy is $T$-horizon optimal;
+        \item for each $z \in \Pb(\Xb)$
+        \begin{align*}
+            \bar v_{\alpha}(z) &=
+            \min_{a \in \Ab} \set*{
+                \bar c (z,a) + \alpha \int\limits_{\Pb(\Xb)} \bar v_{\alpha}(w) \ q(dw|z,a)
+            } \\ &=
+            \min_{a \in \Ab} \set*{
+                \int\limits_{\Xb} c(x,a) \ z(dx) + \alpha
+                \int\limits_{\Xb}\int\limits_{\Xb} \int\limits_{\Yb} \bar v_{\alpha} (H(z,a,y)) \ Q(dy|a,x') \ P(dx'|x,a) \ z(dx)
+            },
+        \end{align*}
+        and the nonempty sets
+        \begin{align*}
+            A_{\alpha}(z) &\defeq \set*{
+                a \in \Ab : \bar v_{\alpha}(z) = \bar c(z,a) + \alpha \int\limits_{\Pb(\Xb)} \bar v_{\alpha}(w) \ q(dw|z,a)
+            },  &&
+            z \in \Pb(\Xb), \quad
+            t=0,1,\dots,
+        \end{align*}
+        satisfy the following properties: (a) the graph $\Gr(A_{t,\alpha}) = \set{(z,a) : z \in \Pb(\Xb), a \in A_{\alpha}(z)}$, $t=0,1,\dots$ is a Borel subset of $\Pb(\Xb) \times \Ab$, and (b) if $\bar v_{t+1,\alpha}(z) = +\infty$, then $A_{\alpha}(z) = \Ab$ and, if $\bar v_{t+1,\alpha}(z) < +\infty$, then $A_{\alpha}(z)$ is compact;
+        \item for infinite horizon problems there exists a stationary discount-optimal $I$-policy $\phi_\alpha$, and a stationary $I$-policy $\phi_\alpha^*$ is optimal if and only if $\phi_\alpha^*(z) \in A_{\alpha}(z)$ for all $z \in \Pb(\Xb)$;
+        \item if $\bar c$ is inf-compact on $\Pb(\Xb) \times \Ab$, then the functions $\bar v_{t,\alpha}$, $t=1,2,\dots$, and $\bar v_\alpha$ are inf-compact on $\Pb(\Xb)$.
+    \end{enumerate}
+\end{theorem}
+
+We are now ready to apply Theorem~\ref{thm:main_result} to obtain continuity of the kernel $q$ for \pomdp{}s with transitions and observations determined by the stochastic equations~\eqref{eq:model}.
+
+\begin{theorem} \label{thm:pomdps_from_equations}
+    Consider the \pomdp{} with transition and observation kernels $T$ and $Q$ defined in~\eqref{eq:model_kernels} for the model~\eqref{eq:model}. Each of the Assumptions~\ref{ass:transition_observation_1},~\ref{ass:transition_observation_2}, and~\ref{ass:SUF} implies that the \comdp{} transition kernel $q$ defined in~\eqref{eq:comdp_kernel_Rn} is weakly continuous.  Therefore, if either Assumption (\textbf{D}) or (\textbf{P}) holds, and the one-step cost function $c$ is $\Kb$-inf-compact, then the conclusions of Theorem~\ref{thm:comdp_results} hold.
+\end{theorem}
+
+\begin{proof}
+    This follows directly from Theorem~\ref{thm:main_result_P} and Theorem~\ref{thm:P_implies_q}.
+\end{proof}
+
+
+
+\section{Applications} \label{sec:applications}
+
+We now return to models of control systems with the form~\eqref{eq:general_kalman_filter}, where $\set{\xi_t}_{t=1}^{\infty}$ and $\set{\eta_t}_{t=1}^{\infty}$ are each iid disturbance processes with common distributions $\mu$ and $\nu$, respectively. Model~\eqref{eq:general_kalman_filter} is a simpler model than~\eqref{eq:model} because it does not include actions in the observation equation. However, this simplification is common in applications. The following theorem is the main result of this section. It follows directly from Theorem~\ref{thm:main_result} applied to the model~\eqref{eq:general_kalman_filter}.
+
+\begin{theorem} \label{thm:state_space_models}
+    Consider the state space model~\eqref{eq:general_kalman_filter} for measurable functions $f : \Xb \times \Ab \times \Xc \to \Xb$ and $h : \Xb \times \Hc \to \Yb$, and for transition disturbances $\set{\xi_t}_{t=1}^{\infty} \iid \mu$ and observation disturbances $\set{\eta_t}_{t=1}^{\infty} \iid \nu$. Under either of the two assumptions:
+    \begin{enumerate}
+        \item the following statements hold:
+        \begin{enumerate}
+            \item for $\mu$-a.s. $\xi \in \Xc$ the map $(x,a) \mapsto f(x,a,\xi)$ is continuous;
+        \item $\Yb = \Hc = \Rb^m$, $\nu \ll \lambda^{[m]}$, and the function $(x,\eta) \mapsto h(x, \eta)$ satisfies Condition~\ref{cond:standard_assumption};
+        \end{enumerate}
+        \item $\Xb = \Xc = \Rb^d$, $\mu \ll \lambda^{[d]}$, and the function $((x,a),\xi) \mapsto f(x,a,\xi)$ satisfies Condition~\ref{cond:standard_assumption};
+    \end{enumerate}
+    the conclusions of Theorem~\ref{thm:main_result} hold.
+\end{theorem}
+
+\begin{proof}
+    This follows directly from Theorem~\ref{thm:main_result} applied to the model~\eqref{eq:general_kalman_filter}.
+\end{proof}
+
+The remainder of this section considers common functional forms of the model~\eqref{eq:model} in the control literature and formulates corollaries of Theorem~\ref{thm:state_space_models} for them. Section~\ref{subsec:additive_noise} deals with linear state space models with additive noise. Section~\ref{subsec:multiplicative_noise} gives an example with multiplicative ``speckle'' noise in the observation model. Section~\ref{subsec:inventory_systems} considers inventory systems with multiple products.
+
+\subsection{Control Systems with Additive Noise} \label{subsec:additive_noise}
+
+Additive noise models of the form
+\begin{subequations} \label{eq:linear_noise_model}
+    \begin{align}
+        x_{t+1} &= f(x_t, a_t) + \xi_t \label{eq:linear_noise_state} \\
+        z_{t+1} &= h(x_{t+1}) + \eta_{t+1} \label{eq:linear_noise_obs}
+    \end{align}
+\end{subequations}
+where $\xi_t \iid \mu \in \Pb(\Xb)$ and $\nu_t \iid \nu \in \Pb(\Yb)$, include the ubiquitous linear state space models, where the controller is faced with the special functional form
+\begin{subequations} \label{eq:linear_state_model}
+    \begin{align}
+        x_{t+1} &= A x_t + B a_t + \xi_t \label{eq:linear_state} \\
+        z_{t+1} &= H x_{t+1} + \eta_{t+1},  \label{eq:linear_obs}
+    \end{align}
+\end{subequations}
+see, e.g.,~\citet[Section 5.1]{simon_optimal_2006} for a typical presentation. Since $D_\eta (h(x) + \eta)$ is the $m\times m$ identity matrix, these additive models satisfy Assumption~\ref{ass:transition_observation_1}. Both models~\eqref{eq:linear_noise_model} and~\eqref{eq:linear_state_model} are special cases of~\eqref{eq:general_kalman_filter} that appear frequently in the control literature; see, e.g.,~\citet{zhou2010solving}. In the linear quadratic regulator problem, the controller is faced with a one-stage cost function
+\begin{equation} \label{eq:lqr_cost}
+    c(x,a) = x^TA x + a^T B + x^T \mathcal{G} a + \gamma_1^Tx + \gamma_2^Ta,
+\end{equation}
+where $A,B,\mathcal{G},\gamma_1,\gamma_2$ are matrices and vectors of the respective dimensions, and $A, B$ are positive definite, that is, there exists $\gamma > 0$ such that $x^T A x \ge \gamma x^Tx > 0$ and $a^TB a \ge \gamma a^Ta > 0$ for each $x,a \ne 0$. Such cost functions are $\Kb$-inf-compact and bounded below. The result of this section shows that under natural conditions, each of these models can be made to satisfy the hypotheses of Theorem~\ref{thm:main_result}.
+
+\begin{corollary}[Additive noise models] \label{cor:additive_noise}
+    Consider the state space model~\eqref{eq:linear_noise_model} for measurable functions $f : \Xb \times \Ab \to \Xb$ and $h : \Xb \to \Yb$, which is always the case in the state space model~\eqref{eq:linear_state_model}. In either of the following cases:
+    \begin{enumerate}
+        \item $f$ and $h$ are continuous, and $\nu \ll \lambda^{[m]}$;
+        \item $f$ is continuous, $\mu \ll \lambda^{[d]}$, and $\nu \ll \lambda^{[m]}$;
+    \end{enumerate}
+    the conclusions of Theorem~\ref{thm:main_result} hold. If the one-stage cost function $c$ is $\Kb$-inf-compact, such as in~\eqref{eq:lqr_cost}, then the conclusions of Theorem~\ref{thm:comdp_results} hold.
+\end{corollary}
+
+\begin{proof}
+    This is a direct consequence of Theorem~\ref{thm:state_space_models} applied to the model~\eqref{eq:linear_noise_model}.
+\end{proof}
+
+We close this section with a general remark about particle filters, and the Kalman filter in particular, from the vantage of Section~\ref{sec:pomdp_kernels}. A filter attempts to determine the posterior conditional distribution of the state $x_{t+1}$ after stepping through the system and observation dynamics. Although the theoretical framework of Section~\ref{sec:pomdp_kernels} is geared towards control problems, not estimation problems, it is instructive to view some of these objects in the light of filters. Consider the problem
+\begin{subequations} \label{eq:filters_as_control}
+    \begin{align}
+        x_{t+1} &= F(x_t, \xi_t) \\
+        y_{t+1} &= G(x_{t+1}, \eta_{t+1})
+    \end{align}
+\end{subequations}
+with cost function $c(x,a) = \sum_{j=1}^{n} (x^{(j)} - a^{(j)})^2$. Notice that the action $a$ does not affect the system evolution or state observations. The controller seeks instead to minimize the sum of squared errors between the action $a$ and the true state $x$. It is well-known that the action at stage $t$ is $a_t = \Eb[x_t|y_0, a_0, y_1, a_1 \dots, y_t]$. Similarly, there is a cost function that results in the controller estimating the conditional covariance of the state $x_t$. A Kalman filter, which calculates the conditional expectation and covariance of the states under the assumption of a linear state space model and Gaussian white noise, can be viewed as a solution to this control problem. Furthermore, the Kalman filter provides a complete description of the posterior distribution of $x_t$ in this setting. Therefore, the Kalman filter is the explicit form of the map $H : \Pb(\Xb) \times \Ab \times \Yb \to \Pb(\Xb)$ used in~\eqref{eq:comdp_kernel_Rn}.
+
+
+\subsection{Control Systems with Multiplicative Noise} \label{subsec:multiplicative_noise}
+
+
+Given a vector $\eta \in \Xb$ denote the square, diagonal matrix in $\Rb^{d \times d}$ with $\eta$ along its diagonal as $\diag(\eta)$. We consider a linear state space model with multiplicative observation disturbances
+\begin{subequations} \label{eq:multiplicative_noise}
+    \begin{align}
+        x_{t+1} &= f(x_t, a_t) + \xi_{t} \\
+        y_{t+1} &= \diag(\eta_{t+1}) x_{t+1} \label{eq:multiplicative_obs}
+    \end{align}
+\end{subequations}
+where $\xi_t \iid \mu \in \Pb(\Xb)$ and $\eta_{t} \iid \nu \in \Pb(\Xb)$ are random processes representing transition noise and observation noise, respectively. The observation model~\eqref{eq:multiplicative_obs} is called a multiplicative observation noise model. Common examples of such noise models are the so-called ``speckle'' noise models arising from computer imaging problems; see, e.g.,~\cite{singh_archives_2021, aubert_variational_2008, yun_multiplicative_2012, bioucas-dias_multiplicative_2010}. In these examples, the vector $\eta_{t}$ is typically assumed to be a multivariate Gamma or Rayleigh distribution as a consequence of physical properties of the imaging procedure. In the image reconstruction problem, the objective usually involves selecting an action $a_t$ that minimizes the squared Euclidean error of the true image and the estimated image $\norm{x_t-a_t}^2$. This is a special case of the one-stage cost function $c(x,a)$ defined in~\eqref{eq:lqr_cost}, which we shall reuse for this setting. If $\mu$ and $\nu$ are continuous distributions, then Theorem~\ref{thm:main_result} holds for the model~\eqref{eq:multiplicative_noise} as the next corollary shows.
+
+\begin{corollary}
+    Consider the state space model~\eqref{eq:multiplicative_noise} with transition disturbances $\xi_t \iid \mu$ and observation disturbances $\eta_t \iid \nu$ and one-stage cost function defined in~\eqref{eq:lqr_cost}. If $\mu, \nu \ll \lambda^{[d]}$ and $f$ is continuous, then the conclusions of Theorem~\ref{thm:main_result} and~\ref{thm:comdp_results} hold.
+\end{corollary}
+
+\begin{proof}
+    We apply Assumption~\ref{ass:SUF} to the model~\eqref{eq:multiplicative_noise}. Let $F(x,a,\xi) = f(x,a) + \xi$. Then $D_\xi F = I$, so $F$ satisfies Condition~\ref{cond:standard_assumption}. Next, for $G(a,x,\eta) = \diag(\eta) x$, one has $D_x G = \sum_{j=1}^{m} \eta^{(j)}$. Since $\set{\eta \in \Rb^m : \sum_{j=1}^{m} \eta^{(j)} = 0}$ has Lebesgue measure 0, it follows that the model~\eqref{eq:multiplicative_noise} satisfies Assumption~\ref{ass:SUF}, so the Corollary follows from Theorem~\ref{thm:pomdps_from_equations}.
+\end{proof}
+
+
+\subsection{Inventory Systems with Noisy Observations} \label{subsec:inventory_systems}
+
+We consider a periodic-review inventory control problem with multiple products, continuous inventory levels, and instant orders. At each period, the controller observes the current inventory level of each of the $n$ products, but the observation is subject to disturbances arising from measurement error. The controller makes a determination for ordering new amounts of each product, which are fulfilled instantly. Demand for each product is realized and subtracted from the inventory level. If the problem allows for backorders, the new inventory level is simply the difference of inventory and demand. In problems with lost sales, the new inventory level for a given product does not decrease below 0. The dynamics of the system follow~\eqref{eq:general_kalman_filter} with the specific functional form
+\begin{subequations} \label{eq:inventory_model}
+    \begin{align}
+        x_{t+1} &= L(x_{t} + a_{t} - \xi_t) \\
+        y_{t+1} &= x_{t+1} + \eta_{t+1}
+    \end{align}
+\end{subequations}
+where $\set{\xi_t}_{t=1}^{\infty}$ is an iid sequence of nonnegative demands with common distribution $\mu \in \Pb(\Xb)$, $L : \Xb \to \Xb$ is defined by $L(x) = x$ for the problem with backorders and $[L(x)]^{(j)} = \max\set{0,x^{(j)}}$ (for component $j=1,\dots,d$) for problems with lost sales, and $\set{\eta_t}_{t=1}^{\infty}$ is an iid sequence of observation disturbances with common distribution $\nu \in \Pb(\Xb)$. The controller faces the one-stage cost function
+\begin{equation} \label{eq:inventory_costs}
+    c(x,a) \defeq
+    \tilde{c}(a) + \int\limits_{\Xc}  h(L(x+a-\xi)) \ \mu(d\xi)
+\end{equation}
+where $\tilde{c} : \Xb \to \Rb$ is an inf-compact function representing order  costs, and $h : \Xb \to [0,+\infty)$ is a convex function satisfying $\lim_{\abs{z} \to +\infty} h(z) = +\infty$ representing holding and backorder costs, which satisfies $\int h(z-\xi) \ \mu(d\xi) < +\infty$ for all $z \in \Xb$. A typical form of the function $\tilde{c}$ is $\tilde{c}(a) \defeq \sum_{j=1}^{d} K^{(j)}\one{a^{(j)} > 0} + \bar c^{(j)} a^{(j)}$, where the vectors $K, \bar c \in \Xb$ have nonnegative components and represent fixed and unit order costs, respectively. The one-stage cost function $c$ is $\Kb$-inf-compact, since for every compact $C \subset \Xb$ and $\gamma \in \Rb$, the inclusion $\set{(x,a) : x \in C, a \geq 0, c(x,a) \leq \gamma} \subset C \times \set{a \in \Xb: \tilde{c}(a) \leq \gamma}$ holds, where the former set is closed and the latter set is compact.
+
+\begin{corollary} \label{cor:inventory_control}
+    Consider the inventory control model~\eqref{eq:inventory_model} with one-stage cost function defined in~\eqref{eq:inventory_costs}. If the observation noise distribution $\nu \ll \lambda^{[d]}$, then the conclusions of Theorem~\ref{thm:main_result} and Theorem~\ref{thm:comdp_results} hold.
+\end{corollary}
+
+\begin{proof}
+    This is a direct application of Theorem~\ref{thm:state_space_models} to the model~\eqref{eq:inventory_model}.
+\end{proof}
+
+% \subsection{Dual Control Systems with Additive Noise} \label{subsec:dual_control}
+% 
+% 
+% % get rid of this, just mention it in the introduction
+% \citet{chapman_2022} developed a control problem for chemotherapy medication dosage using \pomdp{}s arising from a form of~\eqref{eq:general_kalman_filter}. They consider the multi-time-scale dual control system
+% \begin{subequations} \label{eq:chapman}
+%     \begin{align} \label{eq:chapman_state}
+%         x_{t+1} &= f_t(x_t, a_t, \xi_t; \theta), && t \in T, \quad x_t \in \Rb^n, \quad a_t \in \Ab\\
+%         y_t &= h_t(x_t; \theta) + \eta_t, &&t \in T_y, \quad y_t \in \Yb \label{eq:chapman_obs}
+%     \end{align}
+% \end{subequations}
+% where $\xi_t \sim \mu_t \in \Pb(\Sb)$ and $\eta_t \sim \nu_t \in \Pb(\Yb)$, and $\theta \in \Hc$ is a parameter vector with positive values to express the dynamics of states. The true values are unknown, but initial estimates for $\theta$ are available. For time $T \defeq \set{0,1,\dots, N-1}$, and $T_y \in T \cup \set{N}$ denotes the time where the observation is available. The hidden state $x \in \Xb$ represents the concentration of substances in the patient's body, and the observations $y \in \Yb$ represent the results of blood tests. The medications are administered daily, and observations are available on a weekly basis.  \citeauthor{chapman_2022} showed that the \pomdp{} arising from~has optimal policies under the following conditions:
+% \begin{enumerate}
+%     \item $f_t$ is continuous for each $t \in T$;
+%     \item the one-stage cost function $c_t$ is lower semicontinuous and bounded below for each $t \in T \cup \set{N}$;
+%     \item $\Ab$ is compact;
+%     \item $h_t$ is continuous for each $t \in T_y$;
+%     \item $\nu_t \ll \lambda^{[m]}$ for each $t \in T$;
+%     \item $f_t(x, a, \xi; \theta)$ is differentiable in $x$ and $\theta$ for each $t \in T$, $h_t(x; \theta)$ is differentiable in $x$ and $\theta$ for each $t \in T_y$, and the associated Jacobians are continuous.
+% \end{enumerate}
+% Because the structure of the dynamics~\eqref{eq:chapman_state} and observations~\eqref{eq:chapman_obs} can evolve with $t$, this model is not directly comparable with our theory. Similarly, ~\citeauthor{chapman_2022} assume that $\xi_t$ and $\eta_t$ are independent of all other random objects in the system, but they do not assume that the sequences $\set{\xi_t}_{t=1}^{\infty}$ and $\set{\eta_t}_{t=1}^{\infty}$ are comprised of identically distributed disturbances. On the other hand, while we assume that $\xi_t \iid \mu$ and $\eta_t \iid \nu$, we do not assume that the joint distribution of $(\xi_t, \eta_t)$ is independent. Furthermore, the action space $\Ab$ is not assumed to reside in a Euclidean space. Let us suppose, however, that $f_t$, $h_t$, and $c_t$ are independent of $t$, $\xi_t \iid \mu$, $\eta_t \iid \nu$, and that $\Ab \subset \Ab$. Then, when $\Ab$ is compact, $c_t$ is $\Kb$-inf-compact if and only if it is lower semicontinuous. Although nonsingularity of the Jacobians is left unstated, this follows from the additive noise structure of~\eqref{eq:chapman_state} and~\eqref{eq:chapman_obs}, since the Jacobian in this case is the identity matrix. Thus, their model assumptions satisfy the conditions of Theorem~\ref{thm:state_space_models}.
+% 
+% \begin{corollary} \label{cor:dual_control}
+%     Consider the dual control model~\eqref{eq:chapman} with a compact action space and a lower semicontinuous one-stage cost function $c$. If the observation noise distribution $\nu \ll \lambda^{[n]}$, then the conclusions of Theorem~\ref{thm:state_space_models} and Theorem~\ref{thm:comdp_results} hold.
+% \end{corollary}
+
+
+\section{%
+    Another Form of Stochastic Equations
+} \label{sec:pomdp1}
+
+In this section we consider a variation of the model~\eqref{eq:model} under different observation constraints.
+% Platzman noticed that different authors were using a different, non-equivalent model for POMDPs to the aforementioned.
+In particular, we assume that the model is given by the equations
+\begin{subequations} \label{eq:model_pomdp1}
+    \begin{align}
+        \label{eq:transition_model_pomdp1}
+        x_{t+1} &= \tilde{F}(x_t, a_t, \xi_t)
+        &&
+        x_t \in \Xb, \quad
+        a_t \in \Ab, \quad
+        \xi_t \in \Xc, \\
+        \label{eq:eq:observation_model_pomdp1}
+        y_{t+1} &= \tilde{G}(x_t, a_t, \eta_t)
+        &&
+        \eta_t \in \Hc
+    \end{align}
+\end{subequations}
+where $\tilde{F}$ and $\tilde{G}$ are measurable functions, $\set{\xi_{t}}_{t=0}^{\infty} \iid \mu$, and $\set{\nu_t}_{t=0}^{\infty} \iid \nu$. We observe that $\tilde{F}$ in~\eqref{eq:transition_model_pomdp1} and $F$ in~\eqref{eq:transition_model} are identical, while the difference between $\tilde{G}$ in~\eqref{eq:eq:observation_model_pomdp1} and $G$ in~\eqref{eq:observation_model} is that the former depends on the previous state $x_t$, while the latter depends on the next state $x_{t+1}$.
+
+Analogous to~\eqref{eq:model_kernels}, we may consider the stochastic kernels
+\begin{subequations}
+    \label{eq:model_kernels_pomdp1}
+    \begin{align}
+    \tilde{T}(B|x, a) &= \int\limits_{\Xc} \one{\tilde{F}(x, a, \xi) \in B} \ \mu(d\xi), && B \in \Bc (\Xb), \quad x \in \Xb, \quad a \in \Ab, \label{eq:transition_kernel_pomdp1} \\
+    \tilde{Q}(C|x, a) & =\int\limits_{\Hc}\one{\tilde{G}(x, a, \eta) \in C} \ \nu(d\eta),
+    && C \in \Bc (\Yb), \quad x \in \Xb, \quad a \in \Ab,  \label{eq:observation_kernel_pomdp1}
+    \end{align}
+\end{subequations}
+where we note that $\tilde{T}$ and $T$ defined in~\eqref{eq:transition_kernel} are identical. The stochastic kernels $\tilde{T}$ and $\tilde{Q}$ comprise the dynamics of the so-called \pomdpOne{} as defined by~\citet{feinberg_markov_2022}, whereas the stochastic kernels in~\eqref{eq:model_kernels} give rise to a~\pomdpOne{} with  joint stochastic kernel $P$ given by
+\begin{equation} \label{eq:pomdp2_kernel}
+    P(B\times C|x_t, a_t) = \tilde{T}(B|x_t,a_t) \tilde{Q}(C|x_t,a_t);
+\end{equation}
+compare with~\eqref{eq:joint_kernel} for the \pomdpTwo{} equivalent. ~\citet{platzman_1980} was the first to identify two these two non-equivalent ways to model an \mdp{} with incomplete information. His work provided a general form for both models when the observations do not depend on the action; see the discussion in~\citet[Section 3]{feinberg_markov_2022} for the proof that \pomdpOne{} and \pomdpTwo{} are special cases of an \mdp{} with incomplete information (\mdpii{}). From the stochastic kernel $P$ in~\eqref{eq:pomdp2_kernel}, the \pomdpOne{} reduces to the same \comdp{} $(\Pb(\Xb),\Ab, q, \bar{c})$ described in Section~\ref{sec:pomdp_kernels}, and the semi-uniform Feller continuity of $P$ implies weak continuity of the stochastic kernel $q$. The following theorem provides necessary and sufficient conditions for the stochastic kernel $P$ to be semi-uniform Feller.
+
+\begin{theorem}[{\citet[Corollary 6.10]{feinberg_markov_2022}}] \label{thm:pomdp1_results}
+    For a \pomdpOne{} $(\Xb, \Yb, \Ab, \tilde{T}, \tilde{Q}, c)$, the following two conditions holding together:
+    \begin{enumerate}
+        \item the stochastic kernel $\tilde{T}$ is weakly continuous;
+        \item the stochastic kernel $\tilde{Q}$ is continuous in total variation;
+    \end{enumerate}
+    are equivalent to semi-uniform Feller continuity of the stochastic kernel $P$ defined in~\eqref{eq:pomdp2_kernel}.
+\end{theorem}
+
+In view of Theorem~\ref{thm:pomdp1_results}, we can use Theorem~\ref{thm:main_result} to give sufficient conditions for the stochastic kernel $P$ to be semi-uniform Feller continuous when $\tilde{T}$ and $\tilde{Q}$ are generated by the model~\eqref{eq:model_pomdp1}. These conditions are presented in the next theorem.
+
+\begin{theorem} \label{thm:pomdp1_stochastic_equations}
+    If the conditions
+    \begin{enumerate}
+        \item for $\mu$-a.s. $\xi$, the function $(x,a) \mapsto \tilde{F}(x,a,\xi)$ is continuous;
+        \item $\Yb=\Hc=\Rb^m$, $\nu \ll \lambda^{[m]}$, and the function $((x,a), \eta) \to \tilde{G}(x,a,\eta)$ satisfies Condition~\ref{cond:standard_assumption};
+    \end{enumerate}
+    hold, then the stochastic kernels $\tilde{T}$ and $\tilde{Q}$ are weakly continuous and continuous in total variation, respectively. Hence, the conclusions of Theorem~\ref{thm:pomdp1_results} and Theorem~\ref{thm:pomdps_from_equations} hold.
+\end{theorem}
+
+The proof of Theorem~\ref{thm:pomdp1_stochastic_equations} is provided in Section~\ref{sec:proofs}. We remark that the conditions in Theorem~\ref{thm:pomdp1_stochastic_equations} simply state Assumption~\ref{ass:transition_observation_1} for the \pomdpOne{}. Because Theorem~\ref{thm:pomdp1_results} gives necessary and sufficient conditions for $P$ to be semi-uniform Feller, there is no equivalent formulation of Assumptions~\ref{ass:transition_observation_2} or~\ref{ass:SUF} for the \pomdpOne{}. In particular, the marginal kernel $P(\Xb,\:\cdot\:|x,a)$ has the identity $P(\Xb,C|x,a) = \tilde{Q}(C|x,a)$, unlike in the \pomdp{} model.
+
+\section{Proofs}\label{sec:proofs}
+
+In this technical section we provide the proofs to the main results of the paper, including Theorems~\ref{thm:main_result} and~\ref{thm:pomdps_from_equations}. Apropos of proofs to these theorems, we prove a number of results on continuity conditions for stochastic kernels on Euclidean spaces.   The Euclidean norm on $\Rb^n$ is denoted $\norm{\:\cdot\:}$. We write $d(x,A) \defeq \inf_{a \in A} \norm{x-a}$ for the distance from the point $x \in \Rb^n$ to the set $A \subset \Rb^n$. Given two subsets $A, B \subset \Rb^n$ we write the Hausdorff metric
+\begin{equation} \label{eq:hausdorff_metric}
+    d_H(A, B) \defeq \max\set*{
+        \sup_{a \in A} d(a,B),
+        \sup_{b \in B} d(b,A)
+    },
+\end{equation}
+which is nonnegative and possibly infinite. Let $\{C_k\}_{k=1}^{\infty}$ be a sequence of closed subsets of $\Rb^n$. We recall that $C_k$ converges in Hausdorff metric to a closed set $C \subset \Rb^n$ if $d_H(C_k, C) \to 0$ as $k \to \infty$, written $C_k \hto C$. Let $\lambda$ denote Lebesgue measure (the relevant dimension will be clear from context). Integration with respect to $\lambda$ will be written $dx$ instead of $\lambda(dx)$. We recall that $C_k$ converges to $C$ in Lebesgue measure, written $C_k \lto C$, if $\lambda(C_k \triangle C) \to 0$, where $\triangle$ denotes symmetric difference. Equivalently, $C_k \lto C$ if the indicator functions $\oneAlt{C_k}$ converge in Lebesgue measure to $\oneAlt{C}$; see~\citet{beer_hausdorff_1974} for an exposition on this topic. In general, convergence in Hausdorff metric neither implies nor is implied by convergence in Lebesgue measure, even when the sets in question are compact. For example,
+\begin{itemize}
+    \item if we enumerate $\Qb \cap [0,1] = \set{r_1, r_2, \dots}$, then the sets $C_k = \set{r_1, r_2, \dots, r_k}$ converge in Hausdorff metric to $[0,1]$, but $\lambda([0,1] \triangle C_k) = 1$ for all $k$;
+    \item the sets $C_k = \set{k}$ converge in Lebesgue measure to any null set, but has no limit in Hausdorff metric.
+\end{itemize}
+The following lemma gives a special case when convergence in both Hausdorff metric and Lebesgue measure is assured; namely, when the sets in question are the images of a function $\phi : \Rb^n \times \Yb \to \Yb$ carrying $(x,y)$ to $\phi(x,y)$ satisfying Condition~\ref{cond:standard_assumption}.
+
+\begin{lemma} \label{lem:images_converge_in_measure}
+    Suppose the function $\phi(x,y)$ satisfies Condition~\ref{cond:standard_assumption}. Then for every compact set $K \subset \Yb$ and $x' \to x$, the convergences $\phi(x', K) \hto \phi(x,K)$ in Hausdorff metric and $\phi(x', K) \lto \phi(x, K)$ in Lebesgue measure hold; that is, if $x' \to x$, then
+    \begin{equation}
+        \lim_{x' \to x} d_H( \phi(x', K), \phi(x, K)) =
+        \lim_{x' \to x} \lambda( \phi(x', K) \triangle \phi(x, K)) = 0.
+    \end{equation}
+\end{lemma}
+
+\begin{proof}
+    Throughout this proof we will use the shorthand $\phi_x(y) \defeq \phi(x,y)$ and $K_x \defeq \phi_x(K)$ for a given $x \in \Rb^n$. We note that since $\phi_x$ is continuous, each $K_x$ is compact. Given $r > 0$, we will write $A^r = \set{x \in \Rb^n : d(x,A) < r}$. \citet[Theorem 4.26, see also p. 138]{rockafellar_variational_2009} show that if $F$ is a continuous mapping and $\set{C_k}_{k=1}^{\infty}$ is a uniformly bounded sequence of compact sets such that $C_k \hto C$, then $F(C_k) \hto F(C)$. Now, if $x_k \to x$, then $\set{x_k}_{k=1}^{\infty}$ is bounded, and furthermore $\set{x_k} \hto \set{x}$; hence $\set{x_k} \times K \hto \set{x} \times K$. Therefore, $K_{x_k} = \phi(\set{x_k} \times K) \hto \phi(\set{x} \times K) = K_x$, which establishes convergence in Hausdorff metric.
+
+    The rest of the proof concerns convergence in measure. Let $\varepsilon > 0$. Then for each $x$ we can fix an open set $V_x$ such that $K_x \subset V_x$ and $\lambda(V_x \setminus K_x) < \varepsilon$. Similarly, we can fix an open set $W$ such that $K \subset W$ and $\lambda(W \setminus K) < \varepsilon$. This implies that if $V$ is any open set with $K_x \subset V \subset V_x$, then $\lambda(V \setminus K_x) < \varepsilon$, and similarly if $K \subset V \subset W$ then $\lambda(V \setminus K) < \varepsilon$. In particular, for $r_x \defeq \min\set{d_H(\Yb \setminus W, K), d_H(\Yb \setminus V_x, K_x)} \in (0, +\infty)$, it follows that
+    \begin{equation} \label{eq:lem_hausdorff_eq1}
+        \max\set{\lambda(K^r \setminus K), \lambda(K_x^r \setminus K_x)} < \varepsilon, \qquad r \in [0, r_x].
+    \end{equation}
+    Let $x \in \Rb^n$ and $\delta > 0$ be given. Then, since $(x,y) \mapsto D \phi_x$ is continuous, we may fix $L_1 > 0$ such that $\norm{\phi_{x'}(u) - \phi_{x'}(v)} \leq L_1 \norm{u-v}$ whenever $\norm{x'-x} \leq \delta$ and $u, v \in K$. By the inverse function theorem (see, e.g.,~\cite[Theorem 9.24]{walter_rudin_1953}), $\phi_{x'}^{-1}$ exists and is continuously differentiable on $\phi_{x'}(K)$ whenever $\norm{x'-x} \leq \delta$. Therefore, by the same reasoning one has $\norm{\phi_{x'}^{-1}(y) - \phi_{x'}^{-1}(z)} \leq L_2 \norm{y-z}$ whenever $\norm{x'-x} \leq \delta$ and $y, z \in \phi_{x'}(K)$. Let $L = \max\set{L_1, L_2}$. Also, let $M = \max\set{\abs{\det D \phi_{x'}(y)} : \norm{x'-x} \leq \delta, y \in K}$, and observe that $M < +\infty$.
+
+    Now, let $x_k \to x$, and let $r \defeq r_x / (2L)$. Since $K_{x_k} \hto K_x$, we can fix $k_0$ such that $d_H(K_{x_k}, K_x) < \frac{r}{2L}$ for all $k \geq k_0$; i.e., $K_x \subset K_{x_k}^{r/(2L)}$ and $K_{x_k} \subset K_{x}^{r/(2L)}$ for all $k \geq k_0$. Let $U = \phi_x^{-1}(K_x^r)$, and observe that $K \subset U$ and $K_{x_k} \subset \phi_{x_k}(U)$ for all $k \geq k_0$. We first show that there is $k_1$ such that $K_{x_k}^{r/(2L)} \subset \phi_{x_k}(U)$ for all $k \geq k_1$. This follows from the inverse function theorem. Indeed, fix $k_1$ such that $\norm{x_k - x} \leq \delta$ for each $k \geq k_1$. Let $w \in K_{x_k}^{r/(2L)}$, and fix $z \in K_{x_k}$ such that $\norm{w-z} < \frac{r}{2L}$. Then it follows that $\norm{\phi_{x_k}^{-1}(w) - \phi_{x_k}^{-1}(z)} < r$, where $\phi_{x_k}^{-1}(z) \in K$; hence, $\phi_{x_k}^{-1}(w) \in U$, so $w \in \phi_{x_k}(U)$. Next, we show that if $k \geq k_1$, then $\lambda(\phi_{x_k}(U) \setminus K_{x_k}) < M\varepsilon$. If $k \geq k_1$, then $\norm{x_k - x} \leq \delta$, so
+    \begin{equation*}
+        \lambda( \phi_{x_k}(U) \setminus K_{x_k}) = \int\limits_{U \setminus K} \abs{\det D \phi_{x_k}(y)} \ dy \leq M \cdot \lambda(U \setminus K),
+    \end{equation*}
+    following the change-of-variables formula; see, e.g.~\cite[Theorem 7.26]{walter_rudin_1966}.
+    It now suffices to show that $\lambda(U \setminus K) < \varepsilon$. Indeed, if $w \in K_x^r$ we can fix $z \in K_x$ such that $\norm{w-z} < r$. Then $\phi_x^{-1}(w) \in U$ and $\phi_x^{-1}(z) \in K$ and $\norm{\phi_x^{-1}(w) - \phi_x^{-1}(z)} < L r < r_x$, which implies $U \subset K^{r_x}$. Hence $\lambda(U \setminus K) < \varepsilon$, and $\lambda(\phi_{x_k}(U) \setminus K_{x_k}) < M\varepsilon$.
+
+    Therefore, if $k \geq \max\set{k_0,k_1}$, there holds
+    \begin{equation*}
+        \lambda(K_{x_k} \setminus K_x) \leq \lambda(K_x^r \setminus K_x) < \lambda(V \setminus K_x) < \varepsilon,
+    \end{equation*}
+    from~\eqref{eq:lem_hausdorff_eq1},  while
+    \begin{equation*}
+        \lambda(K_x \setminus K_{x_k}) \leq \lambda(K_{x_k}^{r/(2L)} \setminus K_{x_k}) \leq \lambda(\phi_{x_k}(U) \setminus K_{x_k}) < M\varepsilon,
+    \end{equation*}
+    so we obtain the estimate
+    \begin{equation*}
+        \lim_{k \to \infty} \lambda(K_{x_k} \triangle K_x) < (1+M)\varepsilon.
+    \end{equation*}
+    Since $\varepsilon > 0$ was arbitrary, convergence in Lebesgue measure follows.
+\end{proof}
+
+
+
+
+\begin{proof}[{Proof of Theorem~\ref{thm:continuous_total_variation}}]
+    Since $\mu \ll \lambda$, let $f$ be a nonnegative measurable function such that $d\mu = f \ d\lambda$. We shall use the shorthand $\phi_x(y) \defeq \phi(x,y)$ in the proof.
+    Let $x_k \to x$. We need to show that
+    \begin{equation}
+        \adjustlimits\lim_{k \to \infty} \sup_{B \in \Bc(\Sb_2)} \abs{\kappa(B|x_k) - \kappa(B|x)} = 0.
+    \end{equation}
+    Let $\varepsilon > 0$ be arbitrary, and let $B \in \Bc(\Yc)$. Since $\int_{\Yc} f \ d\mu = 1$, the set $A = \set{y \in \Yc : f(y) \leq \frac{2}{\varepsilon}}$ has $\mu(A) \geq 1-\frac{\varepsilon}{2}$ by Markov's inequality. Now, since $\mu \ll \lambda$, it follows that $\mu$ is a regular probability measure; hence, we can fix a compact set $C \subset A$ such that $\mu(C) \geq \mu(A) - \frac{\varepsilon}{2}$. On this set $C$, it follows that $f$ is bounded $f \leq M$ for some $M > 0$, and furthermore $\mu(C) \geq 1-\varepsilon$. Thus,
+    \begin{align*}
+        \abs*{\kappa(B|x_k) - \kappa(B|x)} &=
+        \abs*{
+            \int\limits_{\Yc} \one{\phi_{x_k}(y) \in B} \ \mu(dy) -
+            \int\limits_{\Yc} \one{\phi_{x}(y) \in B} \ \mu(dy)
+        } \\
+        &\leq 2\varepsilon +
+        \abs*{
+            \int\limits_{C} \one{\phi_{x_k}(y) \in B} \ f(y)\, dy -
+            \int\limits_{C} \one{\phi_{x}(y) \in B} \ f(y)\, dy
+        } \\
+        &\leq 2\varepsilon +
+        2M\abs*{
+            \int\limits_{C} \one{\phi_{x_k}(y) \in B} \ dy -
+            \int\limits_{C} \one{\phi_{x}(y) \in B} \ dy
+        }.
+    \end{align*}
+    We now show that the functions $\abs{\det D \phi_{x}}$ and $\abs{\det D\phi_{x_k}}$ are uniformly bounded away from $0$ on $C$. The set $K = (\set{x} \cup \set{x_k}_{k=1}^\infty) \times C$ is compact. By assumption, $(x,y) \mapsto D \phi_x(y)$ is continuous on $K$, so indeed is $(x,y) \mapsto \abs{\det D \phi_x(y)}$. But this latter function is strictly positive on $K$, and since $K$ is compact, we can fix $\beta > 0$ such that $\abs{\det D \phi_x(y)} \geq \beta$ for all $(x,y) \in K$. Now, let us use change-of-coordinates to obtain
+    \begin{align*}
+        \abs*{\kappa(B|x_k) - \kappa(B|x)} \leq 2\varepsilon
+        +2M\abs*{
+            \int\limits_{B \cap \phi^{-1}_{x_k}(C)}
+            \abs*{\det D \phi^{-1}_{x_k}(\tilde y)}
+            \ d\tilde y -
+            \int\limits_{B \cap \phi^{-1}_{x}(C)}
+            \abs*{\det D\phi^{-1}_{x}(\tilde y)}
+            \ d\tilde y
+        }.
+    \end{align*}
+    Since $\phi^{-1}_{x}$ is invertible for all $x$, we can write $(\phi^{-1}_{x_k})^{-1} (C) = \phi_{x_k} (C)$ and $(\phi^{-1}_{x})^{-1} (C) = \phi_{x} (C)$. The inequality $\abs{\det D \phi_x(y)} \geq \beta$ on $K$ implies that $\abs{\det D \phi^{-1}_x(\tilde y)} \leq \beta\inv$ on the compact set $\phi_{x}(C) \cup \bigcup_{k=1}^{\infty} \phi_{x_k}(C)$. Therefore, we obtain the estimate
+    \begin{align*}
+        \begin{split}
+        \abs*{\kappa(B|x_k) - \kappa(B|x)} &\leq
+         2\varepsilon + 2\beta\inv M\cdot \lambda(B \cap [\phi_{x_k} (C) \triangle \phi_{x} (C)]) \\
+        &\qquad +
+        2M\int\limits_{B \cap \phi_{x_k} (C) \cap \phi_{x} (C)} \bigg(\abs*{\det D \phi^{-1}_{x_k}(\tilde y)} - \abs*{\det D \phi^{-1}_{x}(\tilde y)}\bigg) \ d\tilde y \\
+        &\leq
+         2\varepsilon + 2\beta\inv M\cdot \lambda([\phi_{x_k} (C) \triangle \phi_{x} (C)]) \\
+        &\qquad +
+        2M\int\limits_{\phi_{x_k} (C) \cap \phi_{x} (C)} \bigg(\abs*{\det D \phi^{-1}_{x_k}(\tilde y)} - \abs*{\det D \phi^{-1}_{x}(\tilde y)}\bigg) \ d\tilde y,
+        \end{split}
+    \end{align*}
+    and we observe that this estimate does not depend on $B$.
+
+    From Lemma~\ref{lem:images_converge_in_measure}, it follows that $\lambda(\phi_{x_k}(C) \triangle \phi_{x}( C)) \to 0$. To see that
+    \begin{equation} \label{eq:intersection}
+        \lim_{k \to \infty} \int\limits_{\phi_{x_k}(C) \cap \phi_{x}(C)} \bigg(\abs*{\det D\phi^{-1}_{x_k}(\tilde y)} - \abs*{\det D \phi^{-1}_{x} (\tilde y)}\bigg) \ d\tilde y = 0,
+    \end{equation}
+     observe that
+    \begin{equation*}
+        \bigg|\abs*{\det D \phi^{-1}_{x_k}(\tilde{y})} - \abs*{\det D\phi^{-1}_{x}(\tilde y)}\bigg|\leq 2\beta\inv,
+    \end{equation*}
+    and since $\phi^{-1}_x$ is continuously differentiable, the pointwise convergence $D \phi^{-1}_{x_k} \to D \phi^{-1}_{x}$ holds, and consequently the pointwise convergence $\det D\phi^{-1}_{x_k} \to \det D \phi^{-1}_{x}$. Then the dominated convergence theorem implies~\eqref{eq:intersection}. Therefore,
+    \begin{equation*}
+        \lim_{k \to \infty} \sup_{B \in \Bc(\Sb_2)} \abs*{\kappa(B|x_k) - \kappa(B|x)} \leq 2\varepsilon,
+    \end{equation*}
+    and since $\varepsilon > 0$ was arbitrary, it follows that $\kappa$ is continuous in total variation.
+\end{proof}
+
+
+
+
+\begin{proof}[Proof of Theorem~\ref{thm:new}]
+    Necessity follows from Definition~\ref{defi:unifFP}, so let us prove sufficiency. Carath\'eodory's assumptions on $F$ and dominated convergence theorem imply that the stochastic kernel $P$ is weakly continuous. To prove that the stochastic kernel $P$ in \eqref{eq:new} is semi-uniform Feller, let us fix a continuous function $f : \Xb \to \Rb$ with $\abs{f} \leq 1$ and a convergent sequence $(x_{k},a_{k}) \to (x,a)$ as $k\to\infty.$ For each $k=1,2,\ldots$ there exists $C_{k}\in\Bc(\Yb)$ such that
+    \begin{equation}
+        \begin{aligned}
+        \sup_{C\in\Bc(\Yb)} &\abs*{
+            \int\limits_{\Xb} f(x') \ P(dx',C|x_{k},a_{k})-\int\limits_{\Xb} f(x') \ P(dx',C|x,a)
+        } \\
+        &= \abs*{
+            \int\limits_{\Xb} f(x') \ P(dx',C_{k}|x_{k},a_{k})-\int\limits_{\Xb} f(x') \ P(dx',C_{k}|x,a)
+        }=:I_{k}.
+        \end{aligned}
+    \end{equation}
+    According to \eqref{eq:new},
+    \begin{equation}
+        I_{k} = |I^1_{k}-I^2_{k}|\le |I^1_{k}-I^3_{k}|+|I^3_{k}-I^2_{k}|,\quad n=1,2,\ldots,
+    \end{equation}
+    where
+    \begin{align*}
+        I^1_{k} &:= \int\limits_{\Xb}\int\limits_{\Yb} \one{G(a_{k},F(x_{k},a_{k},\xi),\eta) \in C_{k}} f(F(x_{k},a_{k},\xi)) \ \nu(d\eta) \ \mu(d\xi),\\
+        I^2_{k} &:= \int\limits_{\Xb}\int\limits_{\Yb} \one{G(a,F(x,a,\xi),\eta)\in C_{k}}f(F(x,a,\xi)) \ \nu(d\eta) \ \mu(d\xi),\\
+        I^3_{k} &:= \int\limits_{\Xb}\int\limits_{\Yb} \one{G(a,F(x,a,\xi),\eta)\in C_{k}}f(F(x_{k},a_{k},\xi)) \ \nu(d\eta) \ \mu(d\xi).
+    \end{align*}
+    Note that
+    \begin{equation}\label{eq:new2}
+        \limsup_{n\to \infty} \abs{I^1_{k}-I^3_{k}} \le \limsup_{n\to \infty} \sup_{C\in\Bc(\Yb)}\abs{P(\Xb,C|x_{k},a_{k})-P(\Xb,C|x,a)}=0,
+    \end{equation}
+    where the inequality holds because $\abs{f} \leq 1$ according to \eqref{eq:new} with $f\equiv 1$; the equality holds because the marginal kernel $P'(dy|x,a)$ is continuous in total variation.
+    We remark also
+    \begin{equation}\label{eq:new3}
+        \limsup_{n\to \infty} \abs{I^2_{k}-I^3_{k}} \le \limsup_{n\to \infty} \abs*{\int\limits_{\Xb} f(x') \ T(dx'|x_{k},a_{k})-\int\limits_{\Xb} f(x') \ T(dx'|x,a)} = 0,
+    \end{equation}
+    where the inequality follows from \eqref{eq:transition_kernel}; and the equality holds because the kernel $T(dx'|x,a)$ is weakly continuous in view of Lemma~\ref{lem:weak_continuous}.
+\end{proof}
+
+\begin{lemma} \label{lem:kernel_assumptions}
+    Consider the stochastic kernels $T$ and $Q$ defined in~\eqref{eq:model_kernels}.
+    \begin{enumerate}
+        \item Under Assumption~\ref{ass:transition_observation_1}(\ref{item:F1}, $T$ is weakly continuous, and under Assumption~\ref{ass:transition_observation_2}(\ref{item:F2} $T$ is continuous in total variation. %))
+        \item Under Assumption~\ref{ass:transition_observation_1}(\ref{item:G1}, $Q$ is continuous in total variation, and under Assumption~\ref{ass:transition_observation_2}(\ref{item:G2}, $Q$ is continuous in $a$ in total variation. %))
+    \end{enumerate}
+\end{lemma}
+
+\begin{proof}%[{Proof of Lemma~\ref{lem:kernel_assumptions}}]
+    The lemma follows directly from Lemma~\ref{lem:weak_continuous} and Theorem~\ref{thm:continuous_total_variation}. In particular, Assumption~\ref{ass:transition_observation_1}(\ref{item:F1}) and Lemma~\ref{lem:weak_continuous} imply that $T$ is weakly continuous, whereas Assumption~\ref{ass:transition_observation_2}(\ref{item:F2}) and Theorem~\ref{thm:continuous_total_variation} imply that $T$ is continuous in total variation. Similarly, Assumption~\ref{ass:transition_observation_1}(\ref{item:G1}) and Theorem~\ref{thm:continuous_total_variation} imply that $Q$ is continuous in total variation. If $G$ does not depend on $a$, then continuity in $a$ in total variation is immediate. On the other hand, Assumption~\ref{ass:transition_observation_2}(\ref{item:G2}) and Theorem~\ref{thm:continuous_total_variation} imply that $Q$ is continuous in $a$ in total variation if $G$ depends on $a$.
+\end{proof}
+
+We are now ready to prove Theorem~\ref{thm:main_result_P}, which is a consequence of Lemma~\ref{lem:kernel_assumptions}, Theorem~\ref{thm:pomdp_to_comdp_kernel}, and Theorem~\ref{thm:new}.
+
+\begin{proof}[{Proof of Theorem~\ref{thm:main_result_P}}]
+    Lemma~\ref{lem:kernel_assumptions} and Theorem~\ref{thm:pomdp_to_comdp_kernel} imply that Assumptions~\ref{ass:transition_observation_1} and~\ref{ass:transition_observation_2} are each sufficient for $P$ to be semi-uniform Feller.  To verify that Assumption~\ref{ass:SUF} implies that $P$ is semi-uniform Feller, it suffices in view of Theorem~\ref{thm:new} to prove that the marginal kernel $P(\Xb,\:\cdot\:|x,a)$ is continuous in total variation. From~\eqref{eq:new}, we observe that
+    \begin{align*}
+        P(\Xb, C|x,a) &= \int\limits_{\Xb}\int\limits_{\Yb} \one{G(a,F(x,a,\xi), \eta) \in C} \ \nu(d\eta) \ \mu(d\xi), \qquad C \in \Bc(\Yb).
+    \end{align*}
+    Define the stochastic kernel $U_\xi(C|x,a) \defeq \int_{\Yb} \one{G(a,F(x,a,\xi),\eta) \in C} \ \nu(d\eta)$, and observe that $P(\Xb,C|x,a) = \int_{\Xb} U_{\xi}(C|x,a) \ \mu(d\xi)$ for $\mu$-a.s. $\xi$. Since $\phi_\xi((x,a), \eta) \mapsto G(a,F(x,a,\xi),\nu)$ satisfies Condition~\ref{cond:standard_assumption}, Theorem~\ref{thm:continuous_total_variation} implies that $U_\xi$ is continuous in total variation for $\mu$-a.s. $\xi$. Let $(x_k, a_k) \to (x,a)$, and observe that
+    \begin{align*}
+        \sup_{C \in \Bc(\Yb)} \abs*{P(\Xb,C|x_k,a_k) - P(\Xb,C|x,a)}
+        &= \sup_{C \in \Bc(\Yb)} \abs*{
+            \int\limits_{\Yb} U_{\xi}(C|x_k,a_k) - U_{\xi}(C|x,a) \ \mu(d\xi)
+        } \\
+        &\leq \int\limits_{\Yb} \sup_{C \in \Bc(\Yb)} \abs{U_\xi(C|x_k,a_k) - U_\xi(C|x,a)} \ \mu(d\xi).
+    \end{align*}
+    Since $\sup_{C \in \Bc(\Yb)} \abs{U_\xi(C|x_k,a_k) - U_\xi(C|x,a)} \leq 2$, and since $U_\xi$ is continuous in total variation, the dominated convergence theorem implies that
+    \begin{equation*}
+        \lim_{k \to \infty} \sup_{C \in \Bc(\Yb)} \abs*{P(\Xb,C|x_k,a_k) - P(\Xb,C|x,a)} \leq
+        \lim_{k \to \infty} \int\limits_{\Yb} \sup_{C \in \Bc(\Yb)} \abs{U_\xi(C|x_k,a_k) - U_\xi(C|x,a)} \ \mu(d\xi) = 0,
+    \end{equation*}
+    so $P(\Xb,\:\cdot\:|x,a)$ is continuous in total variation, as needed.
+\end{proof}
+
+In view of Theorem~\ref{thm:P_implies_q}, Theorem~\ref{thm:main_result} follows directly from Theorem~\ref{thm:main_result_P}.
+
+\begin{proof}[Proof of Theorem~\ref{thm:main_result}]
+    Apply Theorem~\ref{thm:main_result_P} and Theorem~\ref{thm:P_implies_q}.    
+\end{proof}
+
+Finally, the proof of Theorem~\ref{thm:pomdp1_stochastic_equations} follows from Lemma~\ref{lem:kernel_assumptions}.
+
+\begin{proof}[{Proof of Theorem~\ref{thm:pomdp1_stochastic_equations}}]
+    The conditions on $\tilde{F}$ and $\tilde{G}$ in the hypothesis of Theorem~\ref{thm:pomdp1_stochastic_equations} are identical to Assumption~\ref{ass:transition_observation_1} for the \pomdpOne{}. Hence, Lemma~\ref{lem:kernel_assumptions} implies that $\tilde{T}$ is weakly continuous and $\tilde{Q}$ is continuous in total variation, and Theorem~\ref{thm:pomdp1_results} implies that $P$ is semi-uniform Feller. 
+\end{proof}
+
+
+\bibliography{main}
+
+
+\end{document}
